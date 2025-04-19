@@ -3,7 +3,7 @@
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X81DBBZ0)
 
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
-[![Pub Version](https://img.shields.io/pub/v/argos_translator_offline)](https://pub.dev/packages/argos_translator_offline)
+[![Pub Version](https://img.shields.io/pub/v/localize_generator_keys)](https://pub.dev/packages/localize_generator_keys)
 
 A Dart CLI tool that automatically scans your Flutter project for hardcoded UI strings and replaces them with `.tr` keys for localization using GetX. EasyLocalization etc It also generates a corresponding JSON file containing the translations.
 
@@ -86,6 +86,8 @@ assets/
 # Great Mix 
 
 ## 🌍 Support for Multiple Languages (Offline)
+
+[![Pub Version](https://img.shields.io/pub/v/argos_translator_offline)](https://pub.dev/packages/argos_translator_offline)
 
 To translate your translation files (`lang_en.json`) to other languages without the need for an internet connection, you can use the [argos_translator_offline](https://pub.dev/packages/argos_translator_offline) package that I developed.
 
