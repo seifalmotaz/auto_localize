@@ -1,5 +1,10 @@
 # localize_generator_keys
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X81DBBZ0)
+
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
+[![Pub Version](https://img.shields.io/pub/v/argos_translator_offline)](https://pub.dev/packages/argos_translator_offline)
+
 A Dart CLI tool that automatically scans your Flutter project for hardcoded UI strings and replaces them with `.tr` keys for localization using GetX. EasyLocalization etc It also generates a corresponding JSON file containing the translations.
 
 ## 🚀 Features

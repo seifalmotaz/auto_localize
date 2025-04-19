@@ -7,3 +7,4 @@
 ## 0.0.2 - Improve pub score
 - just solve git issues 
 - remove unused and unAccessible code 
+- ## 0.0.3 - Improve README.MD File
