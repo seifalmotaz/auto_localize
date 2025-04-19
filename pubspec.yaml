@@ -1,9 +1,9 @@
 name: localize_generator_keys
-description: A CLI to extract hardcoded text and generate localization JSON.
-version: 0.0.1
-homepage: https://github.com/abdoelmorap/remove_unused_localizations_keys
-repository: https://github.com/abdoelmorap/remove_unused_localizations_keys
-issue_tracker: https://github.com/abdoelmorap/remove_unused_localizations_keys/issues
+description: A CLI to extract hardcoded text and generate localization JSON fully automation localization migrate from your hardcoded strings.
+version: 0.0.2
+homepage: https://github.com/abdoelmorap/localize_generator_keys
+repository: https://github.com/abdoelmorap/localize_generator_keys
+issue_tracker: https://github.com/abdoelmorap/localize_generator_keys/issues
 
 publisher:
   name: abdelrhmantolba.online

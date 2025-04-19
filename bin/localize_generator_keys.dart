@@ -56,7 +56,6 @@ Future<void> processDirectory(
     if (file is File && file.path.endsWith('.dart')) {
       final content = await file.readAsString();
       var updated = content;
-      Map<int, String> history = {};
 
       for (final pattern in textPatterns) {
         final matches = pattern.allMatches(updated).toList();

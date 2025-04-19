@@ -4,3 +4,6 @@
 - 🚀 Supports all `.json` files dynamically.
 - 🔍 Excludes important localization files to prevent accidental deletions or edit.
 - 📊 Provides detailed output on  keys.
+## 0.0.2 - Improve pub score
+- just solve git issues 
+- remove unused and unAccessible code 
