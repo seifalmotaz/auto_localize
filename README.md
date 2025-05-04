@@ -3,6 +3,7 @@
 A command-line utility that automatically scans your Flutter project to find hardcoded UI strings and replaces them with localization keys using GetX's `.tr` and `.trParams` methods.
 
 > **Orignally Forked from [localize_generator_keys](https://github.com/abdoelmorap/localize_generator_keys) by [Abdelrahman Abdelsalam](https://github.com/abdoelmorap)**
+> This is my own opinionated version of the tool, I added some features.
 
 ## What This Tool Does
 
