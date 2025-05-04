@@ -1,3 +1,20 @@
+## 0.0.1+3
+
+* Fixed bin file references in pubspec.yaml
+* Improved command-line interface
+* Added better error handling for file operations
+
+## 0.0.1+2
+
+* Added support for global installation via `dart pub global activate`
+* Fixed issues with path handling on different operating systems
+* Improved documentation
+
+## 0.0.1+1
+
+* Bug fixes and performance improvements
+* Enhanced pattern matching for text widgets
+
 ## 0.0.1
 
 Initial release of auto_localize:
