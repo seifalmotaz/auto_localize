@@ -1,121 +1,160 @@
-# localize_generator_keys
+# Flutter Localization Automation Tool
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X81DBBZ0)
+A command-line utility that automatically scans your Flutter project to find hardcoded UI strings and replaces them with localization keys using GetX's `.tr` and `.trParams` methods.
 
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
-[![Pub Version](https://img.shields.io/pub/v/localize_generator_keys)](https://pub.dev/packages/localize_generator_keys)
+## What This Tool Does
 
-A Dart CLI tool that automatically scans your Flutter project for hardcoded UI strings and replaces them with `.tr` keys for localization using GetX. EasyLocalization etc It also generates a corresponding JSON file containing the translations.
+This script automates the tedious process of manually implementing localization in Flutter projects by:
 
-## 🚀 Features
-- Detects and replaces hardcoded strings in widgets like `Text`, `TextSpan`, `RichText`, `Text.rich`, and buttons.
-- Generates a translation key based on the original string.
-- Outputs a structured JSON file under `assets/lang/`.
-- Supports customization for language code.
+1. **Scanning Dart Files**: Recursively searches through your project's lib directory for hardcoded strings in UI widgets.
 
-## 📦 Installation
+2. **Identifying Text Patterns**: Detects various text widget patterns including:
+   - Standard `Text` widgets
+   - Text inside buttons and other widgets
+   - `TextSpan` components
+   - `RichText` widgets
+   - Text with complex string interpolation (e.g., `'Expires: ${DateFormat('MMM dd, yyyy').format(item.priceExpiry!)}'`)
 
+3. **String Replacement**:
+   - Converts simple strings like `Text('Hello')` to `Text('hello'.tr)`
+   - Handles complex strings with variables using `trParams` method
+   - Preserves expressions inside string interpolations
 
-Add the package to `dev_dependencies` in `pubspec.yaml`:
+4. **JSON Generation**:
+   - Creates a JSON translation file with original strings as values
+   - Maintains placeholders for interpolated variables
+
+5. **GetX Integration**:
+   - Adds the necessary GetX import if not present
+   - Removes the `const` keyword where needed for compatibility
+
+## Installation
+
+Add this to your `pubspec.yaml`:
 
 ```yaml
-dev_dependencies:
-  localize_generator_keys: latest
+dependencies:
+  auto_localize: ^0.0.1
+  get: ^4.6.5  # Required for the .tr and .trParams methods
 ```
 
-or 
-```bash
-dart pub global activate localize_generator_keys
-```
-
-## 🔧 Usage
-
-From the root of your Flutter project:
+Or install it from the command line:
 
 ```bash
-dart run localize_generator_keys 
+flutter pub add auto_localize
 ```
 
-also can use it like 
+## Usage
+
+### As a Command-Line Tool
+
+You can run the tool directly from the command line:
 
 ```bash
-dart run localize_generator_keys . en
+# Navigate to your Flutter project
+cd path/to/your/flutter/project
+
+# Run the localization tool
+dart run auto_localize [language_code]
 ```
 
-- The first argument is the root path to scan (e.g., `.`).
-- The second argument is the language code (`en`, `ar`, etc).
+Or install it globally:
 
-The tool will:
-- Scan all `.dart` files under `lib/`
-- Replace hardcoded strings with `.tr` keys
-- Output `assets/lang/lang_en.json`
+```bash
+dart pub global activate auto_localize
+```
 
-## 🧠 How it works
-This tool uses regular expressions to match widgets like:
+Then run it from anywhere:
+
+```bash
+auto_localize [project_path] [language_code]
+```
+
+### Programmatic Usage
+
+You can also use the package programmatically in your Dart code:
 
 ```dart
-Text("Hello World")
-TextSpan(text: "Welcome")
-TextButton(child: Text("Click Me"))
-```
+import 'package:auto_localize/auto_localize.dart';
 
-And transforms them into:
+Future<void> main() async {
+  // Run with default settings (current directory, 'en' language)
+  await localize();
 
-```dart
-Text("hello_world".tr)
-TextSpan(text: "welcome".tr)
-TextButton(child: Text("click_me".tr))
-```
-
-With a generated `lang_en.json` like:
-
-```json
-{
-  "hello_world": "Hello World",
-  "welcome": "Welcome",
-  "click_me": "Click Me"
+  // Or with custom settings
+  await localize(
+    projectPath: '/path/to/your/project',
+    lang: 'fr',
+  );
 }
 ```
 
-## 📁 Output
+## Setting Up GetX Translations
+
+After running the tool, you'll need to set up GetX to use the generated translations:
+
+1. Add the following code to your `main.dart` file:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'dart:convert';
+import 'dart:io';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Load translations
+  await loadTranslations();
+
+  runApp(MyApp());
+}
+
+Future<void> loadTranslations() async {
+  // Define supported languages
+  final languages = ['en', 'fr', 'es']; // Add your supported languages
+
+  for (final lang in languages) {
+    try {
+      final jsonString = await rootBundle.loadString('assets/lang/lang_$lang.json');
+      final Map<String, dynamic> translations = json.decode(jsonString);
+      Get.addTranslations({lang: translations});
+    } catch (e) {
+      print('Failed to load $lang translations: $e');
+    }
+  }
+
+  // Set default language
+  Get.locale = const Locale('en', 'US');
+  Get.fallbackLocale = const Locale('en', 'US');
+}
 ```
-assets/
-└── lang/
-    └── lang_en.json
+
+2. Wrap your app with `GetMaterialApp`:
+
+```dart
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GetMaterialApp(
+      title: 'My App',
+      translations: GetxTranslations(), // Your translations class if needed
+      locale: Get.locale,
+      fallbackLocale: Get.fallbackLocale,
+      home: HomePage(),
+    );
+  }
+}
 ```
-# Great Mix 
 
-## 🌍 Support for Multiple Languages (Offline)
+## Running Tests
 
-[![Pub Version](https://img.shields.io/pub/v/argos_translator_offline)](https://pub.dev/packages/argos_translator_offline)
-
-To translate your translation files (`lang_en.json`) to other languages without the need for an internet connection, you can use the [argos_translator_offline](https://pub.dev/packages/argos_translator_offline) package that I developed.
-
-### ✅ Features:
-
-- Offline translation using the Argos Translate library.
-- Supports more than 50 languages.
-- No external API or internet connection required.
-
-### 🧪 Example Usage:
+To run the tests for this package:
 
 ```bash
-dart run argos_translator_offline path=assets/lang/lang_en.json from=en to=ar
+flutter test
 ```
 
-This will translate the file from English to Arabic while maintaining the same structure.
+## Contributing
 
-For more details, check out the [argos_translator_offline](https://pub.dev/packages/argos_translator_offline) package page on pub.dev.
-
-## ⚠️ Limitations
-- Only works with strings in quotes (single/double).
-- Does not detect variables inside text.
-- Regex-based matching may skip edge cases.
-
-## 📄 License
-MIT
-
----
-
-Built with ❤️ by [abdelrhmantolba.online] 
-
+Contributions are welcome! Please feel free to submit a Pull Request.
