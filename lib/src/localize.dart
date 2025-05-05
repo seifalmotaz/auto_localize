@@ -278,9 +278,28 @@ Future<void> processDirectory(
 
           // Only add to JSON map if the key doesn't exist yet
           if (!jsonMap.containsKey(key)) {
-            String jsonValue = formatJsonValue(original, variables);
+            String jsonValue = formatJsonValue(original, variables, package);
             jsonMap[key] = jsonValue;
             debugLog('JSON: "$key" -> "$jsonValue"');
+
+            // For Flutter Intl, we need to add metadata for each key
+            if (package.name == 'Flutter Intl') {
+              // Convert VariableInfo list to a Map<String, String> for the package
+              final placeholdersMap = <String, String>{};
+              for (final variable in variables) {
+                placeholdersMap[variable.paramId] = variable.expression;
+              }
+
+              final metadata = package.generateArbMetadata(
+                key,
+                original,
+                placeholdersMap,
+              );
+              if (metadata.isNotEmpty) {
+                jsonMap['@$key'] = metadata;
+                debugLog('Added metadata for key: $key');
+              }
+            }
           } else {
             debugLog('Reusing existing translation for key: $key');
           }
@@ -387,7 +406,26 @@ List<VariableInfo> processVariables(String text) {
 }
 
 /// Format JSON value with appropriate placeholders
-String formatJsonValue(String original, List<VariableInfo> variables) {
+String formatJsonValue(
+  String original,
+  List<VariableInfo> variables, [
+  LocalizationPackage? package,
+]) {
+  // If a package is provided and it has a custom implementation, use it
+  if (package != null) {
+    // Convert VariableInfo list to a Map<String, String> for the package
+    final placeholdersMap = <String, String>{};
+    for (final variable in variables) {
+      placeholdersMap[variable.paramId] = variable.expression;
+    }
+
+    final customFormat = package.formatJsonValue(original, placeholdersMap);
+    if (customFormat != original) {
+      return customFormat;
+    }
+  }
+
+  // Default implementation (used by GetX)
   String result = original;
 
   // Sort variables by length of original expression (descending)

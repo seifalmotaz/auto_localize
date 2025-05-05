@@ -25,10 +25,42 @@ class GetXPackage implements LocalizationPackage {
   }
 
   @override
-  String replaceStringWithVariables(String fullMatch, String original, String key, String paramsMap) {
+  String replaceStringWithVariables(
+    String fullMatch,
+    String original,
+    String key,
+    String paramsMap,
+  ) {
     return fullMatch
         .replaceFirst('"$original"', "'$key'.trParams($paramsMap)")
         .replaceFirst("'$original'", "'$key'.trParams($paramsMap)");
+  }
+
+  @override
+  String formatJsonValue(String original, Map<String, String> placeholders) {
+    // For GetX, we just replace placeholders with @paramId format
+    String result = original;
+
+    for (final entry in placeholders.entries) {
+      final paramId = entry.key;
+      final expression = entry.value;
+
+      // Replace the expression with the placeholder
+      result = result.replaceAll('\$$expression', '@$paramId');
+      result = result.replaceAll('\${$expression}', '@$paramId');
+    }
+
+    return result;
+  }
+
+  @override
+  String generateArbMetadata(
+    String key,
+    String original,
+    Map<String, String> placeholders,
+  ) {
+    // GetX doesn't use ARB metadata, so we return an empty string
+    return '';
   }
 
   @override

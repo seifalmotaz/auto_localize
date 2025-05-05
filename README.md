@@ -211,6 +211,69 @@ class MyApp extends StatelessWidget {
 }
 ```
 
+#### Advanced Flutter Intl Features
+
+The Flutter Intl implementation supports advanced features like placeholders, plurals, and selects:
+
+1. **Placeholders**: Variables in strings are automatically converted to named parameters:
+
+```dart
+// Original: "Hello, $name!"
+// Generated ARB:
+// "greeting": "Hello, {name}!",
+// "@greeting": {
+//   "description": "A greeting message",
+//   "placeholders": {
+//     "name": {
+//       "type": "String",
+//       "example": "John"
+//     }
+//   }
+// }
+
+// Usage:
+Text(AppLocalizations.of(context)!.greeting(name: userName))
+```
+
+2. **Plurals**: Number variables are automatically detected and can be used with plural forms:
+
+```dart
+// Original: "You have $count messages"
+// Generated ARB:
+// "messageCount": "{count, plural, =0{No messages} =1{One message} other{{count} messages}}",
+// "@messageCount": {
+//   "description": "Message count",
+//   "placeholders": {
+//     "count": {
+//       "type": "num",
+//       "format": "compact"
+//     }
+//   }
+// }
+
+// Usage:
+Text(AppLocalizations.of(context)!.messageCount(count: messages.length))
+```
+
+3. **Selects**: String variables with specific names (gender, type, etc.) can be used with select statements:
+
+```dart
+// Original: "The $gender student"
+// Generated ARB:
+// "studentGender": "{gender, select, male{He} female{She} other{They}}",
+// "@studentGender": {
+//   "description": "Student gender pronoun",
+//   "placeholders": {
+//     "gender": {
+//       "type": "String"
+//     }
+//   }
+// }
+
+// Usage:
+Text(AppLocalizations.of(context)!.studentGender(gender: userGender))
+```
+
 ## Running Tests
 
 To run the tests for this package:

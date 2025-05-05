@@ -1,3 +1,12 @@
+## 0.0.2+1
+
+* Enhanced Flutter Intl support with advanced features:
+  * Added support for placeholders with proper ARB metadata generation
+  * Added support for plurals with automatic number type detection
+  * Added support for selects (gender, etc.) with automatic type detection
+* Improved documentation with examples of advanced Flutter Intl features
+* Fixed minor bugs in package implementations
+
 ## 0.0.2
 
 * Added support for multiple localization packages
