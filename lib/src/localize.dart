@@ -75,15 +75,26 @@ final Set<String> existingPlaceholderIds = {};
 /// Debug mode flag
 bool debugMode = true;
 
-/// Generate a random string of specified length
+/// Generate a random string of specified length that always starts with a letter
 String _generateRandomString(int length) {
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  return String.fromCharCodes(
-    Iterable.generate(
-      length,
-      (_) => chars.codeUnitAt(_random.nextInt(chars.length)),
-    ),
-  );
+
+  // First character must be a letter
+  final firstChar = letters[_random.nextInt(letters.length)];
+
+  // Rest of the characters can be alphanumeric
+  final restOfString =
+      length > 1
+          ? String.fromCharCodes(
+            Iterable.generate(
+              length - 1,
+              (_) => chars.codeUnitAt(_random.nextInt(chars.length)),
+            ),
+          )
+          : '';
+
+  return firstChar + restOfString;
 }
 
 /// Get a consistent ID for an expression, avoiding conflicts with existing IDs
@@ -452,6 +463,7 @@ String buildParamsMap(List<VariableInfo> variables) {
 }
 
 /// Generate a key from text by removing variables and special characters
+/// Ensures the key never starts with a number
 String generateKey(String text) {
   // Remove variables for key generation
   String cleanText = text;
@@ -462,9 +474,17 @@ String generateKey(String text) {
   // Remove complex variables
   cleanText = cleanText.replaceAll(complexVarPattern, '');
 
-  return cleanText
+  // Generate the key by removing special characters and replacing spaces with underscores
+  String key = cleanText
       .toLowerCase()
       .replaceAll(RegExp(r'[^a-z0-9 ]'), '')
       .trim()
       .replaceAll(' ', '_');
+
+  // If the key is empty or starts with a number, prefix it with 'key_'
+  if (key.isEmpty || RegExp(r'^[0-9]').hasMatch(key)) {
+    key = 'key_$key';
+  }
+
+  return key;
 }
