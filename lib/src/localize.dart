@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:path/path.dart' as p;
 
+import 'packages/packages.dart';
+
 /// List of regular expressions to match different text widget patterns
 final List<RegExp> textPatterns = [
   // Standard Text widget - capturing up to 1000 chars to handle more complex strings with variables
@@ -58,8 +60,8 @@ final RegExp complexVarPattern = RegExp(
 /// RegExp for finding placeholders in existing translations
 final RegExp placeholderPattern = RegExp(r'@(\w+)');
 
-/// GetX import statement
-const String getxImport = "import 'package:get/get.dart';";
+/// Default localization package
+LocalizationPackage? _defaultPackage;
 
 /// Random string generator for parameter IDs
 final _random = Random();
@@ -113,9 +115,16 @@ void setDebugMode(bool value) {
 Future<void> localize({
   String? projectPath,
   String lang = 'en',
+  String packageName = 'getx',
 }) async {
   print('🚀 Flutter Localization Script');
-  
+
+  // Get the localization package
+  final package = PackageFactory.getPackage(packageName);
+  _defaultPackage = package;
+
+  print('📦 Using ${package.name} localization package');
+
   final path = projectPath ?? Directory.current.path;
   final outputDir = Directory(p.join(path, 'assets/lang'));
   final output = File(p.join(outputDir.path, 'lang_$lang.json'));
@@ -151,7 +160,7 @@ Future<void> localize({
   }
 
   print('🔍 Scanning for hardcoded text...');
-  await processDirectory(Directory(p.join(path, 'lib')), jsonMap);
+  await processDirectory(Directory(p.join(path, 'lib')), jsonMap, package);
 
   print('🗂️ Creating directory: ${outputDir.path}');
   await outputDir.create(recursive: true);
@@ -183,8 +192,13 @@ Future<void> main(List<String> arguments) async {
   final projectPath =
       arguments.isNotEmpty ? arguments[0] : Directory.current.path;
   final lang = arguments.length > 1 ? arguments[1] : 'en';
-  
-  await localize(projectPath: projectPath, lang: lang);
+  final packageName = arguments.length > 2 ? arguments[2] : 'getx';
+
+  await localize(
+    projectPath: projectPath,
+    lang: lang,
+    packageName: packageName,
+  );
 }
 
 /// Extract placeholder IDs from existing translations
@@ -214,22 +228,21 @@ class VariableInfo {
   });
 }
 
-/// Check if GetX is imported in the file
-bool isGetXImported(String content) {
-  return content.contains(getxImport);
+/// Check if the package is imported in the file
+bool isPackageImported(String content, LocalizationPackage package) {
+  return package.isImported(content);
 }
 
-/// Add GetX import to file content
-String addGetXImport(String content) {
-  // insert as first import
-  final importIndex = content.indexOf('import');
-  return '${content.substring(0, importIndex)}$getxImport\n${content.substring(importIndex)}';
+/// Add the package import to file content
+String addPackageImport(String content, LocalizationPackage package) {
+  return package.addImport(content);
 }
 
 /// Process a directory to find and replace hardcoded strings
 Future<void> processDirectory(
   Directory dir,
   Map<String, String> jsonMap,
+  LocalizationPackage package,
 ) async {
   final files = await dir.list(recursive: true).toList();
   for (final file in files) {
@@ -245,7 +258,7 @@ Future<void> processDirectory(
           final original = match.group(1)!;
 
           // Skip if already localized
-          if (original.contains('.tr')) continue;
+          if (package.isLocalized(original)) continue;
 
           debugLog('Found string: $original');
 
@@ -275,20 +288,21 @@ Future<void> processDirectory(
           final fullMatch = match.group(0)!;
 
           // Skip if already localized
-          if (fullMatch.contains('.tr')) continue;
+          if (package.isLocalized(fullMatch)) continue;
 
           String replacement;
           if (variables.isEmpty) {
             // Simple case - no variables
-            replacement = fullMatch
-                .replaceFirst('"$original"', "'$key'.tr")
-                .replaceFirst("'$original'", "'$key'.tr");
+            replacement = package.replaceSimpleString(fullMatch, original, key);
           } else {
             // Complex case - with variables
             final paramsMap = buildParamsMap(variables);
-            replacement = fullMatch
-                .replaceFirst('"$original"', "'$key'.trParams($paramsMap)")
-                .replaceFirst("'$original'", "'$key'.trParams($paramsMap)");
+            replacement = package.replaceStringWithVariables(
+              fullMatch,
+              original,
+              key,
+              paramsMap,
+            );
           }
 
           // Remove const from Text widgets
@@ -302,10 +316,10 @@ Future<void> processDirectory(
         }
       }
 
-      // Add GetX import if needed and localization was applied
-      if (localizationApplied && !isGetXImported(updated)) {
-        debugLog('Adding GetX import to ${file.path}');
-        updated = addGetXImport(updated);
+      // Add package import if needed and localization was applied
+      if (localizationApplied && !isPackageImported(updated, package)) {
+        debugLog('Adding ${package.name} import to ${file.path}');
+        updated = addPackageImport(updated, package);
       }
 
       if (updated != content) {

@@ -1,6 +1,6 @@
 # Flutter Localization Automation Tool
 
-A command-line utility that automatically scans your Flutter project to find hardcoded UI strings and replaces them with localization keys using GetX's `.tr` and `.trParams` methods.
+A command-line utility that automatically scans your Flutter project to find hardcoded UI strings and replaces them with localization keys. Supports multiple localization packages including GetX and Flutter's built-in localization.
 
 > **Orignally Forked from [localize_generator_keys](https://github.com/abdoelmorap/localize_generator_keys) by [Abdelrahman Abdelsalam](https://github.com/abdoelmorap)**
 > This is my own opinionated version of the tool, I added some features.
@@ -27,8 +27,9 @@ This script automates the tedious process of manually implementing localization 
    - Creates a JSON translation file with original strings as values
    - Maintains placeholders for interpolated variables
 
-5. **GetX Integration**:
-   - Adds the necessary GetX import if not present
+5. **Multiple Package Support**:
+   - Supports GetX (default), Flutter's built-in localization, and more
+   - Adds the necessary imports automatically
    - Removes the `const` keyword where needed for compatibility
 
 ## Installation
@@ -57,9 +58,19 @@ You can run the tool directly from the command line:
 # Navigate to your Flutter project
 cd path/to/your/flutter/project
 
-# Run the localization tool
+# Run the localization tool with default settings (GetX, 'en' language)
+dart run auto_localize
+
+# Run with a specific language
 dart run auto_localize [language_code]
+
+# Run with a specific language and package
+dart run auto_localize [project_path] [language_code] [package_name]
 ```
+
+Supported package names:
+- `getx` (default)
+- `flutter_intl` (Flutter's built-in localization)
 
 Or install it globally:
 
@@ -70,7 +81,7 @@ dart pub global activate auto_localize
 Then run it from anywhere:
 
 ```bash
-auto_localize [project_path] [language_code]
+auto_localize [project_path] [language_code] [package_name]
 ```
 
 ### Programmatic Usage
@@ -81,20 +92,23 @@ You can also use the package programmatically in your Dart code:
 import 'package:auto_localize/auto_localize.dart';
 
 Future<void> main() async {
-  // Run with default settings (current directory, 'en' language)
+  // Run with default settings (current directory, 'en' language, GetX package)
   await localize();
 
   // Or with custom settings
   await localize(
     projectPath: '/path/to/your/project',
     lang: 'fr',
+    packageName: 'getx', // 'getx' or 'flutter_intl'
   );
 }
 ```
 
-## Setting Up GetX Translations
+## Setting Up Translations
 
-After running the tool, you'll need to set up GetX to use the generated translations:
+After running the tool, you'll need to set up your chosen localization package to use the generated translations:
+
+### GetX Setup
 
 1. Add the following code to your `main.dart` file:
 
@@ -145,6 +159,53 @@ class MyApp extends StatelessWidget {
       locale: Get.locale,
       fallbackLocale: Get.fallbackLocale,
       home: HomePage(),
+    );
+  }
+}
+```
+
+### Flutter Intl Setup
+
+1. Configure your `l10n.yaml` file in the root of your project:
+
+```yaml
+arb-dir: assets/lang
+template-arb-file: lang_en.json
+output-localization-file: app_localizations.dart
+```
+
+2. Add the following to your `pubspec.yaml`:
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+flutter:
+  generate: true
+```
+
+3. Use the generated localizations in your app:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: MyHomePage(),
     );
   }
 }

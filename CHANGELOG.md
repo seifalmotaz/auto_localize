@@ -1,3 +1,11 @@
+## 0.0.2
+
+* Added support for multiple localization packages
+* Implemented a modular architecture with package adapters
+* Added support for Flutter's built-in localization (intl)
+* Improved command-line interface with package selection
+* Updated documentation with examples for each supported package
+
 ## 0.0.1+3
 
 * Fixed bin file references in pubspec.yaml
@@ -20,8 +28,9 @@
 Initial release of auto_localize:
 
 * Automatically scan Flutter projects for hardcoded UI strings
-* Replace hardcoded strings with GetX localization keys
+* Replace hardcoded strings with localization keys
 * Support for various text widget patterns (Text, TextSpan, RichText, etc.)
-* Handle complex strings with variables using trParams
+* Handle complex strings with variables
 * Generate JSON translation files with original strings as values
-* Add necessary GetX imports automatically
+* Add necessary imports automatically
+* GetX support
