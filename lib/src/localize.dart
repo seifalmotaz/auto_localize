@@ -61,6 +61,7 @@ final RegExp complexVarPattern = RegExp(
 final RegExp placeholderPattern = RegExp(r'@(\w+)');
 
 /// Default localization package
+// ignore: unused_element
 LocalizationPackage? _defaultPackage;
 
 /// Random string generator for parameter IDs
