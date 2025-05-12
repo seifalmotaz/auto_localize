@@ -105,11 +105,9 @@ class _MyHomePageState extends State<MyHomePage> {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('you_have_pushed_the_button_this_many_times'.tr),
+            Text('youhavepushedthebuttonthismany_times'.tr),
             Text(
-              ''.trParams({
-    '3dm809gp': (_counter).toString()
-  }),
+              '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],

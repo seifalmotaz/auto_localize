@@ -16,9 +16,9 @@ void main() {
     expect(generateKey('9'), equals('key_9'));
   });
 
-  test('generateKey handles empty or invalid input', () {
-    expect(generateKey(''), equals('key_'));
-    expect(generateKey('   '), equals('key_'));
-    expect(generateKey('#@!%'), equals('key_'));
+  test('generateKey handles empty or invalid input by returning null', () {
+    expect(generateKey(''), isNull);
+    expect(generateKey('   '), isNull);
+    expect(generateKey('#@!%'), isNull);
   });
 }

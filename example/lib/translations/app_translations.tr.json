@@ -1,0 +1,11 @@
+{
+  "welcome_message": "Welcome to our app!",
+  "app_title": "Auto Localize Demo",
+  "app_description": "This is a demonstration of custom translation files using .tr.json",
+  "login_button": "Login",
+  "signup_button": "Sign Up",
+  "forgot_password": "Forgot Password?",
+  "terms_and_conditions": "By using this app, you agree to our Terms and Conditions and Privacy Policy.",
+  "greeting_with_name": "Hello, @name! Welcome back.",
+  "items_count": "You have @count items in your cart."
+}

@@ -174,6 +174,9 @@ Future<void> localize({
   print('🔍 Scanning for hardcoded text...');
   await processDirectory(Directory(p.join(path, 'lib')), jsonMap, package);
 
+  // Process custom translation files (*.tr.json)
+  await processCustomTranslationFiles(Directory(p.join(path, 'lib')), jsonMap);
+
   print('🗂️ Creating directory: ${outputDir.path}');
   await outputDir.create(recursive: true);
 
@@ -250,6 +253,48 @@ String addPackageImport(String content, LocalizationPackage package) {
   return package.addImport(content);
 }
 
+/// Find and process custom translation files (*.tr.json)
+Future<void> processCustomTranslationFiles(
+  Directory dir,
+  Map<String, String> jsonMap,
+) async {
+  print('🔍 Scanning for custom translation files (*.tr.json)...');
+  final files = await dir.list(recursive: true).toList();
+  int customKeysCount = 0;
+
+  for (final file in files) {
+    if (file is File && file.path.endsWith('.tr.json')) {
+      try {
+        final content = await file.readAsString();
+        final Map<String, dynamic> customMap = json.decode(content);
+
+        // Merge custom translations into the main map
+        customMap.forEach((key, value) {
+          if (value is String) {
+            jsonMap[key] = value;
+            customKeysCount++;
+
+            // Extract placeholder IDs from custom translations
+            extractPlaceholderIds(value);
+          }
+        });
+
+        print('✅ Loaded custom translations from: ${file.path}');
+      } catch (e) {
+        print('⚠️ Error loading custom translations from ${file.path}: $e');
+      }
+    }
+  }
+
+  if (customKeysCount > 0) {
+    print(
+      '📚 Added $customKeysCount custom translation keys from .tr.json files',
+    );
+  } else {
+    print('ℹ️ No custom translation files found');
+  }
+}
+
 /// Process a directory to find and replace hardcoded strings
 Future<void> processDirectory(
   Directory dir,
@@ -275,6 +320,12 @@ Future<void> processDirectory(
           debugLog('Found string: $original');
 
           final key = generateKey(original);
+
+          // Skip if key is null (empty after cleaning)
+          if (key == null) {
+            debugLog('Skipping empty key for text: $original');
+            continue;
+          }
 
           // Process variables in the string
           final variables = processVariables(original);
@@ -465,7 +516,8 @@ String buildParamsMap(List<VariableInfo> variables) {
 
 /// Generate a key from text by removing variables and special characters
 /// Ensures the key never starts with a number
-String generateKey(String text) {
+/// Returns null if the key would be empty after cleaning
+String? generateKey(String text) {
   // Remove variables for key generation
   String cleanText = text;
 
@@ -482,8 +534,13 @@ String generateKey(String text) {
       .trim()
       .replaceAll(' ', '_');
 
-  // If the key is empty or starts with a number, prefix it with 'key_'
-  if (key.isEmpty || RegExp(r'^[0-9]').hasMatch(key)) {
+  // If the key is empty, return null to skip this text
+  if (key.isEmpty) {
+    return null;
+  }
+
+  // If the key starts with a number, prefix it with 'key_'
+  if (RegExp(r'^[0-9]').hasMatch(key)) {
     key = 'key_$key';
   }
 

@@ -1,0 +1,22 @@
+{
+  "settings_title": "Settings",
+  "theme_settings": "Theme Settings",
+  "dark_mode": "Dark Mode",
+  "light_mode": "Light Mode",
+  "system_default": "System Default",
+  "language_settings": "Language Settings",
+  "english": "English",
+  "french": "French",
+  "spanish": "Spanish",
+  "arabic": "Arabic",
+  "notification_settings": "Notification Settings",
+  "push_notifications": "Push Notifications",
+  "email_notifications": "Email Notifications",
+  "sms_notifications": "SMS Notifications",
+  "account_settings": "Account Settings",
+  "profile_information": "Profile Information",
+  "change_password": "Change Password",
+  "privacy_settings": "Privacy Settings",
+  "logout": "Logout",
+  "delete_account": "Delete Account"
+}

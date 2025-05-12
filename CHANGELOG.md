@@ -1,3 +1,11 @@
+## 0.0.3
+
+* Added support for custom translation keys via `.tr.json` files:
+  * Developers can now create custom translation files anywhere in the lib directory
+  * Custom keys are automatically merged with auto-generated translations
+  * Improved organization of translations by feature or module
+* Updated documentation with examples of custom translation files usage
+
 ## 0.0.2+1
 
 * Enhanced Flutter Intl support with advanced features:

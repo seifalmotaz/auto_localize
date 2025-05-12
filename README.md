@@ -26,6 +26,7 @@ This script automates the tedious process of manually implementing localization 
 4. **JSON Generation**:
    - Creates a JSON translation file with original strings as values
    - Maintains placeholders for interpolated variables
+   - Supports custom translation keys via `.tr.json` files
 
 5. **Multiple Package Support**:
    - Supports GetX (default), Flutter's built-in localization, and more
@@ -272,6 +273,49 @@ Text(AppLocalizations.of(context)!.messageCount(count: messages.length))
 
 // Usage:
 Text(AppLocalizations.of(context)!.studentGender(gender: userGender))
+```
+
+## Custom Translation Keys
+
+You can add custom translation keys by creating `.tr.json` files anywhere in your `lib` directory. These files will be automatically detected and merged with the auto-generated translations.
+
+### Creating Custom Translation Files
+
+1. Create a file with the `.tr.json` extension in any subdirectory of your `lib` folder.
+2. Add your custom translation keys in JSON format:
+
+```json
+{
+  "custom_greeting": "Hello, welcome to our app!",
+  "app_version": "Version 1.0.0",
+  "terms_and_conditions": "By using this app, you agree to our terms and conditions...",
+  "custom_with_variable": "Hello, @name! Welcome back."
+}
+```
+
+3. Run the localization tool as usual, and your custom keys will be merged with the auto-generated ones.
+
+### Benefits of Custom Translation Files
+
+- Organize translations by feature or module
+- Add complex or lengthy translations that would be impractical as hardcoded strings
+- Manually define specific keys for important strings
+- Keep critical translations separate from auto-generated ones
+
+### Example Structure
+
+```
+lib/
+├── main.dart
+├── home/
+│   ├── home_screen.dart
+│   └── home_translations.tr.json
+├── auth/
+│   ├── login_screen.dart
+│   └── auth_translations.tr.json
+└── settings/
+    ├── settings_screen.dart
+    └── settings_translations.tr.json
 ```
 
 ## Running Tests
